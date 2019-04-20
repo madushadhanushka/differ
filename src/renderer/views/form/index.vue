@@ -129,6 +129,12 @@ export default {
         }
         return diff.createPatch(fileName, proStr1, proStr2)
       }
+      var compareJsonFile = function(contentJson1, contentJson2, fileName) {
+        const json = require('json-keys-sort')
+        var sortedJson1 = JSON.stringify(json.sort(JSON.parse(contentJson1), true), null, 4)
+        var sortedJson2 = JSON.stringify(json.sort(JSON.parse(contentJson2), true), null, 4)
+        return diff.createPatch(fileName, sortedJson1, sortedJson2)
+      }
 
       this.infile.diffList = []
       var fs = require('fs')
@@ -140,24 +146,30 @@ export default {
         }
         var fileListXMLOne = []
         var fileListProOne = []
+        var fileListJsnOne = []
         var fileListOthOne = []
         walkSync(this.infile.filenameOne, function(filePath, stat) {
           if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() === 'xml') {
             fileListXMLOne.push(filePath.substr(this.infile.filenameOne.length))
           } else if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() === 'properties') {
             fileListProOne.push(filePath.substr(this.infile.filenameOne.length))
+          } else if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() === 'json') {
+            fileListJsnOne.push(filePath.substr(this.infile.filenameOne.length))
           } else if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() !== 'ds_store') {
             fileListOthOne.push(filePath.substr(this.infile.filenameOne.length))
           }
         }.bind(this))
         var fileListXMLTwo = []
         var fileListProTwo = []
+        var fileListJsnTwo = []
         var fileListOthTwo = []
         walkSync(this.infile.filenameTwo, function(filePath, stat) {
           if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() === 'xml') {
             fileListXMLTwo.push(filePath.substr(this.infile.filenameTwo.length))
           } else if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() === 'properties') {
             fileListProTwo.push(filePath.substr(this.infile.filenameTwo.length))
+          } else if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() === 'json') {
+            fileListJsnTwo.push(filePath.substr(this.infile.filenameTwo.length))
           } else if (filePath.substr(filePath.lastIndexOf('.') + 1).toLowerCase() !== 'ds_store') {
             fileListOthTwo.push(filePath.substr(this.infile.filenameTwo.length))
           }
@@ -167,8 +179,8 @@ export default {
         var unionXMLFile = new Set([...aXML, ...bXML])
         var unionXMLFileList = Array.from(unionXMLFile)
         for (var fileItem in unionXMLFileList) {
-          var content1 = ''
-          var content2 = ''
+          var content1 = '<?xml version = "1.0"?>'
+          var content2 = '<?xml version = "1.0"?>'
           if (fileListXMLOne.indexOf(unionXMLFileList[fileItem]) > -1) {
             content1 = fs.readFileSync(this.infile.filenameOne + unionXMLFileList[fileItem], 'utf8')
           }
@@ -193,6 +205,24 @@ export default {
           var changesPro = compareProFile(contentPro1, contentPro2, unionProFileList[fileItemPro])
           if (changesPro.split('\n').length > 5) {
             this.infile.diffList.push(changesPro)
+          }
+        }
+        var aJson = new Set(fileListJsnOne)
+        var bJson = new Set(fileListJsnTwo)
+        var unionJson = new Set([...aJson, ...bJson])
+        var unionJsonFileList = Array.from(unionJson)
+        for (var jsonFileItem in unionJsonFileList) {
+          var jsonContent1 = '{}'
+          var jsonContent2 = '{}'
+          if (fileListJsnOne.indexOf(unionJsonFileList[jsonFileItem]) > -1) {
+            jsonContent1 = fs.readFileSync(this.infile.filenameOne + unionJsonFileList[jsonFileItem], 'utf8')
+          }
+          if (fileListJsnTwo.indexOf(unionJsonFileList[jsonFileItem]) > -1) {
+            jsonContent2 = fs.readFileSync(this.infile.filenameTwo + unionJsonFileList[jsonFileItem], 'utf8')
+          }
+          var changeJson = compareJsonFile(jsonContent1, jsonContent2, unionJsonFileList[jsonFileItem])
+          if (changeJson.split('\n').length > 5) {
+            this.infile.diffList.push(changeJson)
           }
         }
         var aOth = new Set(fileListOthOne)
@@ -229,6 +259,11 @@ export default {
           var changesProFile = compareProFile(content1, content2, this.infile.filenameOne)
           if (changesProFile.split('\n').length > 5) {
             this.infile.diffList.push(changesProFile)
+          }
+        } else if (fileOneExt.toLowerCase() === 'json' && fileTwoExt.toLowerCase() === 'json') {
+          var changesJsonFile = compareJsonFile(content1, content2, this.infile.filenameOne)
+          if (changesJsonFile.split('\n').length > 5) {
+            this.infile.diffList.push(changesJsonFile)
           }
         } else {
           var changesOthFile = diff.createPatch(this.infile.filenameOne, content1, content2)

@@ -59,6 +59,7 @@
     "dot-properties": "^0.3.1",
     "element-ui": "2.3.4",
     "js-cookie": "^2.2.0",
+    "json-keys-sort": "^1.2.0",
     "normalize.css": "7.0.0",
     "nprogress": "0.2.0",
     "promise": "^8.0.3",
