@@ -2,8 +2,14 @@
 
 > Compare directories easily
 
-This is an electron based application to compare files in two directories. Additianal to the nomal file comparison, this tool also provide support to compare two xml or property file changes whithout considering structural positions.
+This is an electron based application to compare files in two directories. Additianal to the nomal file comparison, this tool also provide support to compare two xml,property or json file changes whithout considering structural positions.
 
+## Structural Comparison Supported File types
+1. XML
+2. JSON
+3. Properties
+
+![Screen Shot](/doc/Screenshot.png)
 
 ## Build Setup
 
@@ -27,4 +33,3 @@ npm run pack
 
 
 ## Download
-
