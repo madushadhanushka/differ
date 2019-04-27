@@ -1,6 +1,6 @@
 # DIFFER
 
-> Compare directories easily
+> Smart file comparison tool
 
 This is an electron based application to compare files in two directories. Additianal to the nomal file comparison, this tool also provide support to compare two xml,property or json file changes whithout considering structural positions.
 

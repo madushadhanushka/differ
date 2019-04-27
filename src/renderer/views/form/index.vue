@@ -386,6 +386,9 @@ export default {
 .el-form-item__content{
   margin-left: 0px;
 }
+.el-button{
+  width: 100px
+}
 .img-prop{
     padding: 5px 20px;
     border-style: solid;
