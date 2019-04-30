@@ -88,7 +88,7 @@ export default {
             this.infile.text2 = resultTwo
             var changes = diff.createPatch(fileName, result, resultTwo)
             if (changes.split('\n').length > 5) {
-              this.infile.diffList.push(changes)
+              this.infile.diffList.push({ fileName: fileName, changes: changes })
             }
           }.bind(this))
         }.bind(this))
@@ -178,16 +178,29 @@ export default {
         var bXML = new Set(fileListXMLTwo)
         var unionXMLFile = new Set([...aXML, ...bXML])
         var unionXMLFileList = Array.from(unionXMLFile)
+        var plainCompare = false
         for (var fileItem in unionXMLFileList) {
-          var content1 = '<?xml version = "1.0"?>'
-          var content2 = '<?xml version = "1.0"?>'
+          var content1 = ''
+          var content2 = ''
+          plainCompare = false
           if (fileListXMLOne.indexOf(unionXMLFileList[fileItem]) > -1) {
             content1 = fs.readFileSync(this.infile.filenameOne + unionXMLFileList[fileItem], 'utf8')
+          } else {
+            plainCompare = true
           }
           if (fileListXMLTwo.indexOf(unionXMLFileList[fileItem]) > -1) {
             content2 = fs.readFileSync(this.infile.filenameTwo + unionXMLFileList[fileItem], 'utf8')
+          } else {
+            plainCompare = true
           }
-          compareXMLFile(content1, content2, unionXMLFileList[fileItem])
+          if (plainCompare) {
+            var changesXMLPlain = diff.createPatch(unionXMLFileList[fileItem], content1, content2)
+            if (changesXMLPlain.split('\n').length > 5) {
+              this.infile.diffList.push({ fileName: unionXMLFileList[fileItem], changes: changesXMLPlain })
+            }
+          } else {
+            compareXMLFile(content1, content2, unionXMLFileList[fileItem])
+          }
         }
         var aPro = new Set(fileListProOne)
         var bPro = new Set(fileListProTwo)
@@ -204,7 +217,7 @@ export default {
           }
           var changesPro = compareProFile(contentPro1, contentPro2, unionProFileList[fileItemPro])
           if (changesPro.split('\n').length > 5) {
-            this.infile.diffList.push(changesPro)
+            this.infile.diffList.push({ fileName: unionProFileList[fileItemPro], changes: changesPro })
           }
         }
         var aJson = new Set(fileListJsnOne)
@@ -212,17 +225,29 @@ export default {
         var unionJson = new Set([...aJson, ...bJson])
         var unionJsonFileList = Array.from(unionJson)
         for (var jsonFileItem in unionJsonFileList) {
-          var jsonContent1 = '{}'
-          var jsonContent2 = '{}'
+          var jsonContent1 = ''
+          var jsonContent2 = ''
+          plainCompare = false
           if (fileListJsnOne.indexOf(unionJsonFileList[jsonFileItem]) > -1) {
             jsonContent1 = fs.readFileSync(this.infile.filenameOne + unionJsonFileList[jsonFileItem], 'utf8')
+          } else {
+            plainCompare = true
           }
           if (fileListJsnTwo.indexOf(unionJsonFileList[jsonFileItem]) > -1) {
             jsonContent2 = fs.readFileSync(this.infile.filenameTwo + unionJsonFileList[jsonFileItem], 'utf8')
+          } else {
+            plainCompare = true
           }
-          var changeJson = compareJsonFile(jsonContent1, jsonContent2, unionJsonFileList[jsonFileItem])
-          if (changeJson.split('\n').length > 5) {
-            this.infile.diffList.push(changeJson)
+          if (plainCompare) {
+            var changesJsonPlain = diff.createPatch(unionJsonFileList[jsonFileItem], jsonContent1, jsonContent2)
+            if (changesJsonPlain.split('\n').length > 5) {
+              this.infile.diffList.push({ fileName: unionJsonFileList[jsonFileItem], changes: changesJsonPlain })
+            }
+          } else {
+            var changeJson = compareJsonFile(jsonContent1, jsonContent2, unionJsonFileList[jsonFileItem])
+            if (changeJson.split('\n').length > 5) {
+              this.infile.diffList.push({ fileName: unionJsonFileList[jsonFileItem], changes: changeJson })
+            }
           }
         }
         var aOth = new Set(fileListOthOne)
@@ -240,7 +265,7 @@ export default {
           }
           var changesOth = diff.createPatch(unionOthFileList[othFileItem], othContent1, othContent2)
           if (changesOth.split('\n').length > 5) {
-            this.infile.diffList.push(changesOth)
+            this.infile.diffList.push({ fileName: unionOthFileList[othFileItem], changes: changesOth })
           }
         }
       } else {
@@ -303,6 +328,15 @@ export default {
       }
       return 0
     },
+    sortDiffFile(a, b) {
+      if (a.fileName < b.fileName) {
+        return -1
+      }
+      if (a.fileName > b.fileName) {
+        return 1
+      }
+      return 0
+    },
     sortJsonRecord(object) {
       var sortedObj = {}
       var keys = Object.keys(object)
@@ -350,8 +384,9 @@ export default {
   computed: {
     prettyHtml: function() {
       var changes = ''
+      this.infile.diffList.sort(this.sortDiffFile)
       for (var diffList in this.infile.diffList) {
-        changes = changes + this.infile.diffList[diffList]
+        changes = changes + this.infile.diffList[diffList].changes
       }
       return Diff2Html.getPrettyHtml(changes, {
         inputFormat: 'diff',
