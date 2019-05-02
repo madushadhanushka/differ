@@ -33,3 +33,12 @@ npm run pack
 
 
 ## Download
+Download the latest binary distribution from [Dropbox](https://clc.to/differ) for your relavant platform.
+
+## Incase of Failure
+- Please makesure to set the execution permission for linux if it is not already set.
+```
+chmod +x differ
+```
+- If you do not already install electron in your machine, then you need to have all lib files which included in the zipped folder to run this application.
+- If you have face any problem of using this application, please raise your issue as a Github issue.
