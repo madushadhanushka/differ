@@ -4,6 +4,8 @@
 
 This is an electron based application to compare files in two directories. Additianal to the nomal file comparison, this tool also provide support to compare two xml,property or json file changes whithout considering structural positions.
 
+Online version available at [Differ](https://differ.netlify.com)
+
 ## Structural Comparison Supported File types
 1. XML
 2. JSON
