@@ -32,8 +32,11 @@
         <el-button type="primary" @click="onSubmit">Compare</el-button>
         <el-button type="infor" @click="onTypeChange">{{this.infile.outputType}}</el-button>
         <el-button type="infor" @click="onModeChange">{{this.infile.inputMode}}</el-button>
+        <el-button type="infor" @click="onCompareModeChange">{{this.infile.compareMode}}</el-button>
+        <el-button type="infor" @click.native="scrollFix('#top_div')">Top</el-button>
       </div>
     </el-form>
+    <div id="top_div"/>
     <div class="free-prop"/>
     <div v-html="prettyHtml"></div>
   </div>
@@ -50,6 +53,7 @@ export default {
         filenameOne: 'Select folder one',
         filenameTwo: 'Select folder two',
         outputFormat: 'side-by-side',
+        compareMode: 'Struct',
         outputType: 'Unify',
         inputDirMode: true,
         inputMode: 'Folder',
@@ -58,7 +62,65 @@ export default {
     }
   },
   methods: {
-    onSubmit() {
+    comparePlain() {
+      var fs = require('fs')
+      var diff = require('diff')
+      this.infile.diffList = []
+      if (this.infile.inputMode === 'Folder') {
+        var fileListOne = []
+        var fileListTwo = []
+        walkSync(this.infile.filenameOne, function(filePath, stat) {
+          fileListOne.push(filePath.substr(this.infile.filenameOne.length))
+        }.bind(this))
+        walkSync(this.infile.filenameTwo, function(filePath, stat) {
+          fileListTwo.push(filePath.substr(this.infile.filenameTwo.length))
+        }.bind(this))
+        var aOth = new Set(fileListOne)
+        var bOth = new Set(fileListTwo)
+        var unionOthFile = new Set([...aOth, ...bOth])
+        var unionOthFileList = Array.from(unionOthFile)
+        for (var othFileItem in unionOthFileList) {
+          var othContent1 = ''
+          var othContent2 = ''
+          if (fileListOne.indexOf(unionOthFileList[othFileItem]) > -1) {
+            othContent1 = fs.readFileSync(this.infile.filenameOne + unionOthFileList[othFileItem], 'utf8')
+          }
+          if (fileListTwo.indexOf(unionOthFileList[othFileItem]) > -1) {
+            othContent2 = fs.readFileSync(this.infile.filenameTwo + unionOthFileList[othFileItem], 'utf8')
+          }
+          var changesOth = diff.createPatch(unionOthFileList[othFileItem], othContent1, othContent2)
+          if (changesOth.split('\n').length > 5) {
+            this.infile.diffList.push({ fileName: unionOthFileList[othFileItem], changes: changesOth })
+          }
+        }
+      } else {
+        if (!(fs.existsSync(this.infile.filenameOne) && fs.existsSync(this.infile.filenameTwo))) {
+          console.warn('no file exist')
+          return
+        }
+        var content1, content2
+        content1 = fs.readFileSync(this.infile.filenameOne, 'utf8')
+        content2 = fs.readFileSync(this.infile.filenameTwo, 'utf8')
+        var changesOthFile = diff.createPatch(this.infile.filenameOne, content1, content2)
+        this.infile.diffList.push({ fileName: this.infile.filenameOne, changes: changesOthFile })
+      }
+      function walkSync(currentDirPath, callback) {
+        fs.readdirSync(currentDirPath).forEach(function(name) {
+          if (name.substr(name.lastIndexOf('.') + 1).toLowerCase() !== 'ds_store') {
+            var path = require('path')
+            var filePath = path.join(currentDirPath, name)
+            var stat = fs.statSync(filePath)
+            if (stat.isFile()) {
+              callback(filePath, stat)
+            } else if (stat.isDirectory()) {
+              walkSync(filePath, callback)
+            }
+          }
+        })
+      }
+    },
+    compareStruct() {
+      this.infile.diffList = []
       var compareXMLFile = function(xml1, xml2, fileName) {
         var convert = require('xml-js')
 
@@ -135,8 +197,6 @@ export default {
         var sortedJson2 = JSON.stringify(json.sort(JSON.parse(contentJson2), true), null, 4)
         return diff.createPatch(fileName, sortedJson1, sortedJson2)
       }
-
-      this.infile.diffList = []
       var fs = require('fs')
       var diff = require('diff')
       if (this.infile.inputMode === 'Folder') {
@@ -275,7 +335,6 @@ export default {
         }
         var fileOneExt = this.infile.filenameOne.substr(this.infile.filenameOne.lastIndexOf('.') + 1)
         var fileTwoExt = this.infile.filenameTwo.substr(this.infile.filenameTwo.lastIndexOf('.') + 1)
-        console.log('file', fileOneExt, fileTwoExt)
         content1 = fs.readFileSync(this.infile.filenameOne, 'utf8')
         content2 = fs.readFileSync(this.infile.filenameTwo, 'utf8')
         if (fileOneExt.toLowerCase() === 'xml' && fileTwoExt.toLowerCase() === 'xml') {
@@ -283,21 +342,28 @@ export default {
         } else if (fileOneExt.toLowerCase() === 'properties' && fileTwoExt.toLowerCase() === 'properties') {
           var changesProFile = compareProFile(content1, content2, this.infile.filenameOne)
           if (changesProFile.split('\n').length > 5) {
-            this.infile.diffList.push(changesProFile)
+            this.infile.diffList.push({ fileName: this.infile.filenameOne, changes: changesProFile })
           }
         } else if (fileOneExt.toLowerCase() === 'json' && fileTwoExt.toLowerCase() === 'json') {
           var changesJsonFile = compareJsonFile(content1, content2, this.infile.filenameOne)
           if (changesJsonFile.split('\n').length > 5) {
-            this.infile.diffList.push(changesJsonFile)
+            this.infile.diffList.push({ fileName: this.infile.filenameOne, changes: changesJsonFile })
           }
         } else {
           var changesOthFile = diff.createPatch(this.infile.filenameOne, content1, content2)
           if (changesOthFile.split('\n').length > 5) {
-            this.infile.diffList.push(changesOthFile)
+            this.infile.diffList.push({ fileName: this.infile.filenameOne, changes: changesOthFile })
           }
         }
       }
       this.$message('Done!')
+    },
+    onSubmit() {
+      if (this.infile.compareMode === 'Plain') {
+        this.comparePlain()
+      } else {
+        this.compareStruct()
+      }
     },
     inputFile: function(newFile, oldFile) {
       if (typeof this.$refs.upload1.files[0] !== 'undefined') {
@@ -379,6 +445,17 @@ export default {
       }
       this.$refs.upload1.files = []
       this.$refs.upload2.files = []
+    },
+    onCompareModeChange() {
+      if (this.infile.compareMode === 'Plain') {
+        this.infile.compareMode = 'Struct'
+      } else {
+        this.infile.compareMode = 'Plain'
+      }
+      this.onSubmit()
+    },
+    scrollFix(hashbang) {
+      location.href = hashbang
     }
   },
   computed: {
@@ -432,12 +509,14 @@ export default {
     border-color: #cec4c4;
     border-radius: 4px;
     margin: 5px 5px 0px;
+    float: left;
 }
 .div-prop{
     float: right;
     padding-top: 20px;
     padding-left: 10px;
     font-size: small;
+    float: left;
 }
 .span-prop{
     border-style: solid;
