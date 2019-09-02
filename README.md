@@ -38,10 +38,10 @@ npm run pack
 
 
 ## Download
-Download the latest binary distribution from [Dropbox](https://clc.to/differ) for your relavant platform.
-- [Linux](https://www.dropbox.com/s/kvwtlfo1sgbvb2o/differ-linux.zip?dl=1)
-- [Mac](https://www.dropbox.com/s/j42llwmpa8d9zir/differ-mac.zip?dl=1)
-- [Windows](https://www.dropbox.com/s/uvp1gh8k6ekg2ef/differ-win.zip?dl=1)
+Download the latest binary distribution for your relavant platform.
+- [Linux](https://github.com/madushadhanushka/differ/releases/download/v0.1.0/differ-linux_v0.1.0.zip)
+- [Mac](https://github.com/madushadhanushka/differ/releases/download/v0.1.0/differ-mac_v0.1.0.zip)
+- [Windows](https://github.com/madushadhanushka/differ/releases/download/v0.1.0/differ-win_v0.1.0.zip)
 
 ## Incase of Failure
 - Please makesure to set the execution permission for linux if it is not already set.
