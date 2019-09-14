@@ -29,11 +29,26 @@
       </el-col>
     </el-row>
       <div class="el-form-item_custom">
-        <el-button type="primary" @click="onSubmit">Compare</el-button>
-        <el-button type="infor" @click="onTypeChange">{{this.infile.outputType}}</el-button>
-        <el-button type="infor" @click="onModeChange">{{this.infile.inputMode}}</el-button>
-        <el-button type="infor" @click="onCompareModeChange">{{this.infile.compareMode}}</el-button>
-        <el-button type="infor" @click.native="scrollFix('#top_div')">Top</el-button>
+        <span class="tooltip">
+          <img src="./../../assets/compare.png" width="50px" height="50px" @click="onSubmit" class="compare-btn list-ico-prop">
+          <span class="tooltiptext">Compare</span>
+        </span>
+        <span class="tooltip">
+          <img :src="this.infile.outputTypeImg" width="50px" height="50px" @click="onTypeChange" class="list-ico-prop">
+          <span class="tooltiptext">{{this.infile.outputTypeCmt}}</span>
+        </span>
+        <span class="tooltip">
+          <img :src="this.infile.inputModeImg" width="50px" height="50px" @click="onModeChange" class="list-ico-prop">
+          <span class="tooltiptext">{{this.infile.inputModeCmt}}</span>
+        </span>
+        <span class="tooltip">
+          <img :src="this.infile.compareModeImg" width="50px" height="50px" @click="onCompareModeChange" class="list-ico-prop">
+          <span class="tooltiptext">{{this.infile.compareModeCmt}}</span>
+        </span>
+        <span class="tooltip">
+          <img src="./../../assets/top.png" width="50px" height="50px" @click="scrollFix('#top_div')" class="list-ico-prop">
+          <span class="tooltiptext">Move top</span>
+        </span>
       </div>
     </el-form>
     <div id="top_div"/>
@@ -54,9 +69,15 @@ export default {
         filenameTwo: 'Select folder two',
         outputFormat: 'side-by-side',
         compareMode: 'Struct',
+        compareModeImg: require('./../../assets/structure.png'),
+        compareModeCmt: 'Compare in Plain mode',
         outputType: 'Unify',
+        outputTypeImg: require('./../../assets/split.png'),
+        outputTypeCmt: 'Change to Unify mode',
         inputDirMode: true,
         inputMode: 'Folder',
+        inputModeImg: require('./../../assets/folder.jpg'),
+        inputModeCmt: 'Change to File mode',
         diffList: []
       }
     }
@@ -426,9 +447,13 @@ export default {
       if (this.infile.outputType === 'Unify') {
         this.infile.outputType = 'Split'
         this.infile.outputFormat = 'line-by-line'
+        this.infile.outputTypeImg = require('./../../assets/unify.jpg')
+        this.infile.outputTypeCmt = 'Change to Split mode'
       } else {
         this.infile.outputType = 'Unify'
         this.infile.outputFormat = 'side-by-side'
+        this.infile.outputTypeImg = require('./../../assets/split.png')
+        this.infile.outputTypeCmt = 'Change to Unify mode'
       }
     },
     onModeChange() {
@@ -437,11 +462,15 @@ export default {
         this.infile.inputDirMode = true
         this.infile.filenameOne = 'Select folder one'
         this.infile.filenameTwo = 'Select folder two'
+        this.infile.inputModeImg = require('./../../assets/folder.jpg')
+        this.infile.inputModeCmt = 'Change to File mode'
       } else {
         this.infile.inputMode = 'File'
         this.infile.inputDirMode = false
         this.infile.filenameOne = 'Select file one'
         this.infile.filenameTwo = 'Select file two'
+        this.infile.inputModeImg = require('./../../assets/file.jpg')
+        this.infile.inputModeCmt = 'Change to Folder mode'
       }
       this.$refs.upload1.files = []
       this.$refs.upload2.files = []
@@ -449,8 +478,12 @@ export default {
     onCompareModeChange() {
       if (this.infile.compareMode === 'Plain') {
         this.infile.compareMode = 'Struct'
+        this.infile.compareModeImg = require('./../../assets/plain.png')
+        this.infile.compareModeCmt = 'Compare in Structure mode'
       } else {
         this.infile.compareMode = 'Plain'
+        this.infile.compareModeImg = require('./../../assets/structure.png')
+        this.infile.compareModeCmt = 'Compare in Plain mode'
       }
       this.onSubmit()
     },
@@ -538,6 +571,44 @@ export default {
 }
 .free-prop{
   height: 125px;
+}
+.list-ico-prop{
+    border: gray;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 2px 2px;
+    cursor: pointer;
+}
+.compare-btn{
+    background-color: #b4c1f3;
+    margin-right: 45px;
+}
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  font-size: 13px;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 </style>
 
