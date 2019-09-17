@@ -11,10 +11,7 @@ Online version available at [Differ](https://differ.netlify.com)
 2. JSON
 3. Properties
 
-![Screen Shot](/doc/Screenshot.png)
-
-## Demo
-[![Differ](http://img.youtube.com/vi/O1LqN8wELDs/0.jpg)](http://www.youtube.com/watch?v=O1LqN8wELDs)
+![Screen Shot](/doc/differgif.gif)
 
 ## Build Setup
 

@@ -30,23 +30,23 @@
     </el-row>
       <div class="el-form-item_custom">
         <span class="tooltip">
-          <img src="./../../assets/compare.png" width="50px" height="50px" @click="onSubmit" class="compare-btn list-ico-prop">
-          <span class="tooltiptext">Compare</span>
-        </span>
-        <span class="tooltip">
-          <img :src="this.infile.outputTypeImg" width="50px" height="50px" @click="onTypeChange" class="list-ico-prop">
-          <span class="tooltiptext">{{this.infile.outputTypeCmt}}</span>
-        </span>
-        <span class="tooltip">
-          <img :src="this.infile.inputModeImg" width="50px" height="50px" @click="onModeChange" class="list-ico-prop">
+          <img :src="this.infile.inputModeImg" width="40px" height="40px" @click="onModeChange" class="list-ico-prop">
           <span class="tooltiptext">{{this.infile.inputModeCmt}}</span>
         </span>
         <span class="tooltip">
-          <img :src="this.infile.compareModeImg" width="50px" height="50px" @click="onCompareModeChange" class="list-ico-prop">
+          <img src="./../../assets/compare.png" width="40px" height="40px" @click="onSubmit" class="compare-btn list-ico-prop">
+          <span class="tooltiptext">Compare</span>
+        </span>
+        <span class="tooltip">
+          <img :src="this.infile.outputTypeImg" width="40px" height="40px" @click="onTypeChange" class="list-ico-prop">
+          <span class="tooltiptext">{{this.infile.outputTypeCmt}}</span>
+        </span>
+        <span class="tooltip">
+          <img :src="this.infile.compareModeImg" width="40px" height="40px" @click="onCompareModeChange" class="list-ico-prop">
           <span class="tooltiptext">{{this.infile.compareModeCmt}}</span>
         </span>
         <span class="tooltip">
-          <img src="./../../assets/top.png" width="50px" height="50px" @click="scrollFix('#top_div')" class="list-ico-prop">
+          <img src="./../../assets/top.png" width="40px" height="40px" @click="scrollFix('#top_div')" class="list-ico-prop">
           <span class="tooltiptext">Move top</span>
         </span>
       </div>
@@ -76,7 +76,7 @@ export default {
         outputTypeCmt: 'Change to Unify mode',
         inputDirMode: true,
         inputMode: 'Folder',
-        inputModeImg: require('./../../assets/folder.jpg'),
+        inputModeImg: require('./../../assets/folder.png'),
         inputModeCmt: 'Change to File mode',
         diffList: []
       }
@@ -462,7 +462,7 @@ export default {
         this.infile.inputDirMode = true
         this.infile.filenameOne = 'Select folder one'
         this.infile.filenameTwo = 'Select folder two'
-        this.infile.inputModeImg = require('./../../assets/folder.jpg')
+        this.infile.inputModeImg = require('./../../assets/folder.png')
         this.infile.inputModeCmt = 'Change to File mode'
       } else {
         this.infile.inputMode = 'File'
